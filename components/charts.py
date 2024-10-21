@@ -1,8 +1,14 @@
 import math
 import numpy as np
-import pandas as pd 
+import pandas as pd
 from pythermalcomfort.psychrometrics import t_o, psy_ta_rh
-from pythermalcomfort.models import pmv, cooling_effect, adaptive_en, adaptive_ashrae, two_nodes
+from pythermalcomfort.models import (
+    pmv,
+    cooling_effect,
+    adaptive_en,
+    adaptive_ashrae,
+    two_nodes,
+)
 from pythermalcomfort.utilities import v_relative, clo_dynamic, units_converter
 from scipy import optimize
 
@@ -79,7 +85,7 @@ def adaptive_chart(
     if units == UnitSystem.IP.value:
         x_values = np.array([50, 92.3]) if model == "iso" else np.array([50, 92.3])
     else:
-        x_values = np.array([10, 30]) if model == "iso" else np.array([10, 33.5])
+        x_values = np.array([10, 33.5]) if model == "iso" else np.array([10, 33.5])
 
     if model == "iso":
         adaptive_func = adaptive_en
@@ -161,11 +167,11 @@ def adaptive_chart(
     layout = go.Layout(
         xaxis=dict(
             title=(
-                "Outdoor Running Mean Temperature [°C]"
+                "Prevailing Mean Outdoor Temperature [°C]"
                 if units == UnitSystem.SI.value
                 else "Prevailing Mean Outdoor Temperature [°F]"
             ),
-            range=[10, 30] if model == "iso" else [10, 33.5],
+            range=[10, 33.5] if model == "iso" else [10, 33.5],
             dtick=2 if units == UnitSystem.SI.value else 5,
             showgrid=True,
             gridcolor="lightgray",
@@ -182,7 +188,7 @@ def adaptive_chart(
                 if units == UnitSystem.SI.value
                 else "Operative Temperature [°F]"
             ),
-            range=[14, 36] if units == UnitSystem.SI.value else [60, 104],
+            range=[14, 36] if units == UnitSystem.SI.value else [57.2, 97.6],
             dtick=2 if units == UnitSystem.SI.value else 5,
             showgrid=True,
             gridcolor="lightgray",
@@ -374,7 +380,7 @@ def t_rh_pmv(
 
     if units == UnitSystem.IP.value:
         fig.update_layout(
-            xaxis=dict(title="Dry-bulb Temperature [°F]", range=[50, 100], dtick=5),
+            xaxis=dict(title="Dry-bulb Temperature [°F]", range=[50, 96.8], dtick=5),
         )
 
     # Add grid lines and make the spines invisible
@@ -1012,7 +1018,7 @@ def SET_outputs_chart(
     )
     return fig
 
-  
+
 def find_tdb_for_pmv(
     target_pmv,
     tr,
@@ -1142,7 +1148,7 @@ def psy_pmv(
             upper_hr.append(
                 psy_ta_rh(tdb=upper_tdb[i], rh=upper_rh_list[i])["hr"] * 1000
             )
-            
+
         if units == UnitSystem.IP.value:
             lower_tdb = list(
                 map(
@@ -1160,7 +1166,7 @@ def psy_pmv(
                     upper_tdb,
                 )
             )
-        
+
         new_lower_tdb, new_lower_hr = curve_fit(lower_tdb, lower_hr)
         new_upper_tdb, new_upper_hr = curve_fit(upper_tdb, upper_hr)
 
